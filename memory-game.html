@@ -15,6 +15,16 @@
             --success-color: #4caf50;
         }
 
+        /* Dark theme overrides (applied via html[data-theme="dark"]) */
+        :root[data-theme="dark"] {
+            --primary-color: #90caf9;
+            --background-color: #121212;
+            --card-back: #263238;
+            --card-front: #1e1e1e;
+            --text-color: #e0e0e0;
+            --success-color: #66bb6a;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -89,6 +99,20 @@
 
         button:hover {
             background-color: #1565c0;
+        }
+
+        /* Small theme toggle button */
+        .theme-toggle {
+            padding: 0.25rem 0.5rem;
+            font-size: 1.1rem;
+            background: transparent;
+            color: inherit;
+            border: 2px solid transparent;
+        }
+
+        .theme-toggle[aria-pressed="true"] {
+            border-color: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
         }
 
         button.active {
@@ -234,6 +258,7 @@
                 <h2>Rating</h2>
                 <p class="stat-value rating" aria-live="polite">★★★</p>
             </div>
+            <button class="theme-toggle" aria-pressed="false" title="Toggle dark mode">🌙</button>
         </div>
 
         <!-- Grid size selector -->
@@ -287,7 +312,39 @@
             finalStats: document.querySelector('.final-stats'),
             gridButtons: document.querySelectorAll('.grid-btn'),
             scoresList: document.querySelector('.scores-list')
+            ,themeToggle: document.querySelector('.theme-toggle')
         };
+
+        // Theme handling
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                if (elements.themeToggle) {
+                    elements.themeToggle.setAttribute('aria-pressed', 'true');
+                    elements.themeToggle.textContent = '☀️';
+                }
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                if (elements.themeToggle) {
+                    elements.themeToggle.setAttribute('aria-pressed', 'false');
+                    elements.themeToggle.textContent = '🌙';
+                }
+            }
+        }
+
+        // Initialize theme from localStorage
+        const savedTheme = localStorage.getItem('memoryGameTheme') || 'light';
+        applyTheme(savedTheme);
+
+        // Theme toggle handler
+        if (elements.themeToggle) {
+            elements.themeToggle.addEventListener('click', () => {
+                const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+                const next = current === 'dark' ? 'light' : 'dark';
+                applyTheme(next);
+                localStorage.setItem('memoryGameTheme', next);
+            });
+        }
 
         // Card symbols (emojis) for both grid sizes
         const symbols = {
